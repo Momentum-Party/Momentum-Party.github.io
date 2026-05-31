@@ -1,0 +1,749 @@
+/* Policy page — Instagram post cards */
+.policy-page {
+  --cyan: #00c8ff;
+  --media-bg: #080c1a;
+  --ease-rich: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-spring: cubic-bezier(0.34, 1.45, 0.64, 1);
+  font-family: 'Sarabun', 'Inter', system-ui, sans-serif;
+}
+
+@keyframes policyFadeUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes policyGlowPulse {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes policyShimmer {
+  0% {
+    transform: translate3d(-120%, 0, 0) skewX(-18deg);
+  }
+  100% {
+    transform: translate3d(220%, 0, 0) skewX(-18deg);
+  }
+}
+
+@keyframes policyEmojiFloat {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -6px, 0) scale(1.06);
+  }
+}
+
+@keyframes policyCardIn {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 36px, 0) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes policyDetailUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 16px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes policyTagPop {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes policyClosePulse {
+  0%, 100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.75;
+  }
+}
+
+@keyframes policyFrameGlow {
+  0%, 100% {
+    box-shadow:
+      0 20px 48px rgba(0, 0, 0, 0.35),
+      0 0 0 1px rgba(0, 200, 255, 0.2),
+      0 0 32px rgba(0, 200, 255, 0.15);
+  }
+  50% {
+    box-shadow:
+      0 28px 60px rgba(0, 0, 0, 0.42),
+      0 0 0 1px rgba(0, 200, 255, 0.45),
+      0 0 56px rgba(0, 200, 255, 0.35);
+  }
+}
+
+@keyframes policyEmojiHover {
+  0%, 100% {
+    transform: translate3d(0, 0, 0) scale(1.08) rotate(-3deg);
+  }
+  50% {
+    transform: translate3d(0, -10px, 0) scale(1.14) rotate(3deg);
+  }
+}
+
+@keyframes policyIconWiggle {
+  0%, 100% {
+    transform: scale(1);
+  }
+  25% {
+    transform: scale(1.18) rotate(-8deg);
+  }
+  75% {
+    transform: scale(1.12) rotate(8deg);
+  }
+}
+
+.policy-page .navbar__links a.is-active {
+  color: var(--text);
+  background: rgba(0, 200, 255, 0.12);
+}
+
+/* ── Hero ── */
+.policy-hero {
+  padding: calc(var(--nav-height) + 2.5rem) 1.5rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.policy-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: min(720px, 90vw);
+  height: 280px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse at 50% 0%, rgba(0, 200, 255, 0.18) 0%, transparent 68%);
+  pointer-events: none;
+  animation: policyGlowPulse 5s ease-in-out infinite;
+}
+
+.policy-hero__eyebrow,
+.policy-hero__title-line,
+.policy-hero__subtitle {
+  opacity: 0;
+}
+
+.policy-page.is-loaded .policy-hero__eyebrow {
+  animation: policyFadeUp 0.85s var(--ease-rich) forwards;
+}
+
+.policy-page.is-loaded .policy-hero__title-line:nth-child(1) {
+  animation: policyFadeUp 0.9s var(--ease-spring) 0.12s forwards;
+}
+
+.policy-page.is-loaded .policy-hero__title-line:nth-child(2) {
+  animation: policyFadeUp 0.9s var(--ease-spring) 0.22s forwards;
+}
+
+.policy-page.is-loaded .policy-hero__subtitle {
+  animation: policyFadeUp 0.85s var(--ease-rich) 0.38s forwards;
+}
+
+.policy-hero__eyebrow {
+  position: relative;
+  font-family: 'Kanit', sans-serif;
+  font-size: clamp(0.75rem, 1.5vw, 0.875rem);
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 1rem;
+  text-shadow: 0 0 40px rgba(0, 200, 255, 0.35);
+}
+
+.policy-hero__title {
+  position: relative;
+  font-family: 'Kanit', sans-serif;
+  font-weight: 900;
+  line-height: 1.05;
+  margin-bottom: 0.75rem;
+}
+
+.policy-hero__title-line {
+  display: block;
+  font-size: clamp(2.5rem, 8vw, 4.25rem);
+  color: var(--cyan);
+  text-shadow:
+    0 0 48px rgba(0, 200, 255, 0.25),
+    0 0 96px rgba(0, 200, 255, 0.12);
+}
+
+.policy-hero__subtitle {
+  position: relative;
+  font-family: 'Sarabun', sans-serif;
+  font-size: clamp(0.9375rem, 2vw, 1.125rem);
+  font-weight: 400;
+  color: var(--text-muted);
+  max-width: 32rem;
+  margin: 0 auto;
+  line-height: 1.65;
+}
+
+/* ── Grid ── */
+.policy-grid-section {
+  padding: 0 1.5rem 4.5rem;
+}
+
+.policy-grid {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ── Instagram card ── */
+.ig-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  overflow: hidden;
+  min-width: 0;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  opacity: 0;
+  transform: translate3d(0, 36px, 0) scale(0.94);
+  transition:
+    transform 0.45s var(--ease-rich),
+    box-shadow 0.45s var(--ease-rich),
+    border-color 0.35s ease;
+}
+
+/* Animated cyan ring on hover (frame) */
+.ig-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 8px;
+  padding: 2px;
+  background: linear-gradient(
+    135deg,
+    rgba(0, 200, 255, 0.9),
+    rgba(0, 200, 255, 0.15) 40%,
+    rgba(0, 200, 255, 0.6) 70%,
+    rgba(0, 200, 255, 0.9)
+  );
+  background-size: 200% 200%;
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 4;
+  transition: opacity 0.35s var(--ease-rich);
+}
+
+.policy-page.is-loaded .ig-card {
+  animation: policyCardIn 0.75s var(--ease-spring) forwards;
+  animation-delay: calc(0.45s + var(--i, 0) * 0.07s);
+}
+
+@media (hover: hover) {
+  .ig-card:hover:not(.is-open) {
+    transform: scale(1.06);
+    border-color: rgba(0, 200, 255, 0.55);
+    opacity: 1;
+    box-shadow:
+      0 20px 48px rgba(0, 0, 0, 0.35),
+      0 0 0 1px rgba(0, 200, 255, 0.2),
+      0 0 32px rgba(0, 200, 255, 0.15);
+  }
+
+  .ig-card:hover:not(.is-open)::after {
+    opacity: 1;
+    animation: policyShimmer 2.5s linear infinite;
+  }
+
+  .ig-card:hover:not(.is-open) .ig-card__media {
+    transform: scale(1.04);
+  }
+
+  .ig-card:hover:not(.is-open) .ig-card__media::before {
+    background: radial-gradient(
+      ellipse 85% 75% at 50% 45%,
+      rgba(0, 200, 255, 0.45) 0%,
+      rgba(0, 200, 255, 0.15) 45%,
+      transparent 72%
+    );
+    animation: policyGlowPulse 1.4s ease-in-out infinite;
+  }
+
+  .ig-card:hover:not(.is-open) .ig-card__media::after {
+    opacity: 1;
+    animation: policyShimmer 2s var(--ease-rich) infinite;
+  }
+
+  .ig-card:hover:not(.is-open) .ig-card__emoji {
+    animation: policyEmojiHover 1.2s ease-in-out infinite;
+    filter: drop-shadow(0 10px 28px rgba(0, 200, 255, 0.45));
+  }
+
+  .ig-card:hover:not(.is-open) .ig-card__title {
+    transform: scale(1.05);
+    text-shadow: 0 0 24px rgba(0, 200, 255, 0.55);
+  }
+
+  .ig-card:hover:not(.is-open) .ig-card__hook {
+    color: #00c8ff;
+    letter-spacing: 0.02em;
+  }
+
+  .ig-card:hover:not(.is-open) .ig-card__num {
+    opacity: 1;
+    text-shadow: 0 0 16px rgba(0, 200, 255, 0.6);
+  }
+
+  .ig-card:hover:not(.is-open) .ig-card__avatar {
+    transform: scale(1.12);
+    box-shadow:
+      0 0 0 2px #fff,
+      0 0 0 3px var(--cyan),
+      0 0 20px rgba(0, 200, 255, 0.4);
+  }
+
+  .ig-card:hover:not(.is-open) .ig-card__user {
+    color: #0099c7;
+  }
+
+  .ig-card:hover:not(.is-open) .ig-card__action--like svg {
+    animation: policyIconWiggle 0.55s var(--ease-spring) infinite;
+  }
+
+  .ig-card:hover:not(.is-open) .ig-card__action:not(.ig-card__action--like):not(.ig-card__action--save) svg {
+    transform: scale(1.1);
+    transition: transform 0.25s var(--ease-spring);
+  }
+
+  .ig-card:hover:not(.is-open) .ig-card__action--save svg {
+    transform: scale(1.08) translateY(-1px);
+    transition: transform 0.25s var(--ease-spring);
+  }
+}
+
+.ig-card.is-open {
+  transform: translate3d(0, -4px, 0) scale(1.01);
+  border-color: rgba(0, 200, 255, 0.5);
+  box-shadow:
+    0 24px 56px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(0, 200, 255, 0.25),
+    0 0 56px rgba(0, 200, 255, 0.2);
+}
+
+.ig-card:focus-visible {
+  outline: 2px solid var(--cyan);
+  outline-offset: 2px;
+}
+
+.ig-card__header {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.75rem;
+  background: #fff;
+}
+
+.ig-card__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #1e1f54;
+  transition:
+    transform 0.4s var(--ease-spring),
+    box-shadow 0.4s var(--ease-rich);
+}
+
+.ig-card__user {
+  flex: 1;
+  font-family: 'Sarabun', sans-serif;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #262626;
+  letter-spacing: 0.01em;
+  transition: color 0.35s var(--ease-rich);
+}
+
+.ig-card__menu {
+  color: #262626;
+  font-size: 0.875rem;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  user-select: none;
+}
+
+/* Square dark media area */
+.ig-card__media {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  background: var(--media-bg);
+  overflow: hidden;
+  transition: transform 0.45s var(--ease-rich);
+}
+
+.ig-card__media::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 80% 70% at 50% 45%,
+    rgba(0, 200, 255, 0.28) 0%,
+    rgba(0, 200, 255, 0.08) 45%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+  animation: policyGlowPulse 4.5s ease-in-out infinite;
+}
+
+.ig-card__media::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 20%,
+    rgba(0, 200, 255, 0.06) 45%,
+    rgba(255, 255, 255, 0.12) 50%,
+    rgba(0, 200, 255, 0.06) 55%,
+    transparent 80%
+  );
+  pointer-events: none;
+  z-index: 3;
+  animation: policyShimmer 7s var(--ease-rich) infinite;
+  animation-delay: calc(var(--i, 0) * 0.4s);
+}
+
+.ig-card.is-open .ig-card__media::after {
+  animation-play-state: paused;
+  opacity: 0;
+}
+
+.ig-card__face {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.25rem;
+  transition:
+    opacity 0.35s var(--ease-rich),
+    transform 0.4s var(--ease-rich);
+}
+
+.ig-card.is-open .ig-card__face {
+  opacity: 0;
+  transform: scale(0.92);
+  pointer-events: none;
+}
+
+.ig-card:not(.is-open) .ig-card__face {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+
+.ig-card__num {
+  position: absolute;
+  top: 0.875rem;
+  left: 0.875rem;
+  font-family: 'Kanit', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--cyan);
+  opacity: 0.85;
+  transition:
+    opacity 0.35s ease,
+    text-shadow 0.35s ease;
+}
+
+.ig-card__emoji {
+  font-size: 2.75rem;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+  display: inline-block;
+  animation: policyEmojiFloat 3.5s ease-in-out infinite;
+  animation-delay: calc(var(--i, 0) * 0.15s);
+  filter: drop-shadow(0 8px 20px rgba(0, 200, 255, 0.25));
+}
+
+.ig-card.is-open .ig-card__emoji {
+  animation-play-state: paused;
+}
+
+.ig-card__title {
+  font-family: 'Kanit', sans-serif;
+  font-size: clamp(0.875rem, 2.5vw, 1.0625rem);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.35;
+  margin-bottom: 0.5rem;
+  max-width: 17rem;
+  transition:
+    transform 0.4s var(--ease-spring),
+    text-shadow 0.4s var(--ease-rich);
+}
+
+.ig-card__hook {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  color: rgba(0, 200, 255, 0.9);
+  line-height: 1.45;
+  max-width: 14rem;
+  transition:
+    color 0.35s var(--ease-rich),
+    letter-spacing 0.35s var(--ease-rich);
+}
+
+/* Detail overlay */
+.ig-card__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 1.5rem 1.25rem;
+  background: rgba(8, 12, 26, 0.96);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(0.96);
+  transition:
+    opacity 0.35s var(--ease-rich),
+    transform 0.4s var(--ease-spring),
+    visibility 0.35s;
+}
+
+.ig-card.is-open .ig-card__overlay {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: scale(1);
+}
+
+/* Force overlay fully hidden when closed (fixes animation fill-mode sticking) */
+.ig-card:not(.is-open) .ig-card__overlay {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: scale(0.96);
+}
+
+.ig-card:not(.is-open) .ig-card__detail,
+.ig-card:not(.is-open) .ig-card__category,
+.ig-card:not(.is-open) .ig-card__close-hint {
+  opacity: 0;
+  transform: translate3d(0, 12px, 0) scale(0.96);
+  animation: none;
+}
+
+.ig-card__detail {
+  font-family: 'Sarabun', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.92);
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  max-width: 16.5rem;
+  max-height: 62%;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 200, 255, 0.4) transparent;
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+  transition:
+    opacity 0.3s var(--ease-rich),
+    transform 0.35s var(--ease-rich);
+}
+
+.ig-card.is-open .ig-card__detail {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition-delay: 0.06s;
+}
+
+.ig-card__category {
+  font-family: 'Kanit', sans-serif;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  padding: 0.35rem 0.75rem;
+  border: 1px solid rgba(0, 200, 255, 0.45);
+  border-radius: 100px;
+  box-shadow: 0 0 24px rgba(0, 200, 255, 0.2);
+  opacity: 0;
+  transform: scale(0.92);
+  transition:
+    opacity 0.3s var(--ease-rich),
+    transform 0.35s var(--ease-spring);
+}
+
+.ig-card.is-open .ig-card__category {
+  opacity: 1;
+  transform: scale(1);
+  transition-delay: 0.12s;
+}
+
+.ig-card__close-hint {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.875rem;
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.45);
+  line-height: 1;
+  opacity: 0;
+  transform: translate3d(0, -6px, 0);
+  transition:
+    opacity 0.25s var(--ease-rich),
+    transform 0.3s var(--ease-rich);
+}
+
+.ig-card.is-open .ig-card__close-hint {
+  opacity: 0.55;
+  transform: translate3d(0, 0, 0);
+  transition-delay: 0.1s;
+  animation: policyClosePulse 2s ease-in-out 0.35s infinite;
+}
+
+/* Action bar */
+.ig-card__footer {
+  padding: 0.5rem 0.75rem 0.625rem;
+  background: #fff;
+  pointer-events: none;
+}
+
+.ig-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ig-card__action {
+  display: inline-flex;
+  color: #262626;
+}
+
+.ig-card__action svg {
+  width: 24px;
+  height: 24px;
+  display: block;
+  transition: transform 0.3s var(--ease-spring);
+}
+
+.ig-card__action--like svg {
+  color: #ed4956;
+}
+
+.ig-card__action--save {
+  margin-left: auto;
+}
+
+.policy-page.is-loaded .ig-card__action--like svg {
+  animation: policyTagPop 0.5s var(--ease-spring) calc(0.9s + var(--i, 0) * 0.07s) backwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .policy-hero::before,
+  .policy-hero__eyebrow,
+  .policy-hero__title-line,
+  .policy-hero__subtitle,
+  .ig-card,
+  .ig-card__media::before,
+  .ig-card__media::after,
+  .ig-card__emoji,
+  .ig-card__overlay,
+  .ig-card__detail,
+  .ig-card__category,
+  .ig-card__close-hint,
+  .ig-card__action--like svg,
+  .ig-card::after {
+    animation: none !important;
+    transition: none !important;
+    opacity: 0 !important;
+  }
+
+  @media (hover: hover) {
+    .ig-card:hover:not(.is-open) {
+      animation: none !important;
+      transform: translate3d(0, -4px, 0);
+    }
+  }
+
+  .policy-hero__eyebrow,
+  .policy-hero__title-line,
+  .policy-hero__subtitle,
+  .ig-card {
+    opacity: 1;
+    transform: none;
+  }
+
+  .ig-card__face {
+    transition: opacity 0.15s ease;
+  }
+
+  .ig-card__overlay {
+    transition: opacity 0.15s ease;
+  }
+
+  .ig-card.is-open .ig-card__detail,
+  .ig-card.is-open .ig-card__category,
+  .ig-card.is-open .ig-card__close-hint {
+    opacity: 1;
+    transform: none;
+  }
+}

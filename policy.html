@@ -1,16 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Momentum Policy — Our party's policies and positions.">
-  <title>Policy | Momentum</title>
+  <meta name="description" content="นโยบายโมเมนตัม — 12 นโยบายที่เราจะทำเพื่อนักเรียนทุกคน">
+  <title>นโยบาย | Momentum</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@700;900&family=Sarabun:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/policy.css">
 </head>
-<body>
+<body class="policy-page">
 
   <header class="navbar" role="banner">
     <div class="navbar__inner">
@@ -46,18 +47,17 @@
   </header>
 
   <main>
-    <section class="page-hero">
-      <div class="section__inner">
-        <p class="section__label">What We Stand For</p>
-        <h1 class="section__title">Policy</h1>
-        <p class="section__desc">This page is ready for you to add your party's policies, positions, and platform details.</p>
-      </div>
+    <section class="policy-hero">
+      <p class="policy-hero__eyebrow">สิ่งที่เราจะทำเพื่อคุณ</p>
+      <h1 class="policy-hero__title">
+        <span class="policy-hero__title-line">นโยบาย</span>
+        <span class="policy-hero__title-line">โมเมนตัม</span>
+      </h1>
+      <p class="policy-hero__subtitle">แผนดำเนินการของเรา | นำโดยภารกิจ ปณิธาน และผู้คน</p>
     </section>
 
-    <section class="page-content">
-      <div class="section__inner">
-        <p>Content coming soon. Edit <code>policy.html</code> to build out this page.</p>
-      </div>
+    <section class="policy-grid-section" aria-label="นโยบายทั้งหมด">
+      <div class="policy-grid" id="policy-grid"></div>
     </section>
   </main>
 
@@ -79,6 +79,7 @@
     </div>
   </footer>
 
+  <script src="js/policy.js"></script>
   <script>
     const toggle = document.getElementById('nav-toggle');
     const navLinks = document.getElementById('nav-links');
