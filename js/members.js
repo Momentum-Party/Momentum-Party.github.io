@@ -252,6 +252,72 @@ function normalizePhotoUrl(url) {
   return trimmed;
 }
 
+const MEMBER_PHOTO_BASE = 'image/members page/1x1';
+
+/** Stems match files in image/members page/1x1/ (nickname → filename without .jpg). */
+const MEMBER_PHOTO_STEMS = [
+  'ใบเฟิร์น',
+  'ลิต',
+  'อามิส',
+  'ใบไม้',
+  'กาก้า',
+  'ขิม',
+  'ข้าวฟ่าง',
+  'คอปเตอร์',
+  'ชินจัง',
+  'ตะวัน',
+  'ตัวโน็ต',
+  'ต้นข้าว',
+  'ทิพย์',
+  'ธี',
+  'บาส',
+  'บี',
+  'ปั้น',
+  'พอเพียง',
+  'วันพุธ',
+  'ออแกนร์',
+  'เจน',
+  'เจนนี่',
+  'เจ้านาย',
+  'เชฟ',
+  'เชอร์รี่',
+  'แชมป์',
+  'แซนต้า',
+  'แบม',
+  'แพม',
+  'โฟล์ค',
+  'โมเมย์',
+  'โรมัน',
+  'ไอคิว',
+];
+
+const MEMBER_PHOTO_STEM_LOOKUP = (() => {
+  const map = new Map();
+  for (const stem of MEMBER_PHOTO_STEMS) {
+    map.set(stem, stem);
+    if (/^[a-z0-9]+$/i.test(stem)) map.set(stem.toLowerCase(), stem);
+  }
+  return map;
+})();
+
+function localMemberPhotoUrl(nickname) {
+  const key = (nickname || '').trim();
+  if (!key) return '';
+  const stem = MEMBER_PHOTO_STEM_LOOKUP.get(key) ?? MEMBER_PHOTO_STEM_LOOKUP.get(key.toLowerCase());
+  if (!stem) return '';
+  const filename = `${stem}.jpg`;
+  return `${MEMBER_PHOTO_BASE}/${filename}`
+    .split('/')
+    .map(part => encodeURIComponent(part))
+    .join('/');
+}
+
+function resolveMemberPhoto(nickname, sheetPhoto) {
+  const fromSheet = normalizePhotoUrl(sheetPhoto);
+  if (fromSheet) return fromSheet;
+  return localMemberPhotoUrl(nickname);
+}
+
 function classifyMember(row, index) {
   const name = normalizeKey(row, 'name');
   const nickname = normalizeKey(row, 'nickname');
@@ -261,7 +327,7 @@ function classifyMember(row, index) {
   const experience = normalizeKey(row, 'experience');
   const igLink = normalizeKey(row, 'ig_link');
   const motto = normalizeKey(row, 'motto');
-  const photo = normalizePhotoUrl(normalizeKey(row, 'photo'));
+  const photo = resolveMemberPhoto(nickname, normalizeKey(row, 'photo'));
 
   if (!name) return null;
 
