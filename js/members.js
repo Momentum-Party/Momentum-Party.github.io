@@ -15,7 +15,7 @@ const RESIZE_DEBOUNCE_MS = 150;
 // (5 minutes). After 5 min the cache is still SHOWN instantly
 // but a background refresh quietly fetches new data.
 // ─────────────────────────────────────────────────────────────
-const CACHE_KEY = 'momentum_members_v1';
+const CACHE_KEY = 'momentum_members_v2';
 const CACHE_TTL_MS = 5 * 60 * 1000;
 
 const DEPT_LABELS = {
@@ -254,73 +254,46 @@ function normalizePhotoUrl(url) {
 
 const MEMBER_PHOTO_BASE = 'image/members page/1x1';
 
-/** Stems match files in image/members page/1x1/ (nickname → filename without .jpg). */
-const MEMBER_PHOTO_STEMS = [
-  'ใบเฟิร์น',
-  'ลิต',
-  'อามิส',
-  'ใบไม้',
-  'กาก้า',
-  'ขิม',
-  'ข้าวฟ่าง',
-  'คอปเตอร์',
-  'ชินจัง',
-  'ตะวัน',
-  'ตัวโน็ต',
-  'ต้นข้าว',
-  'ทิพย์',
-  'ธี',
-  'บาส',
-  'บี',
-  'ปั้น',
-  'พอเพียง',
-  'วันพุธ',
-  'ออแกนร์',
-  'เจน',
-  'เจนนี่',
-  'เจ้านาย',
-  'เชฟ',
-  'เชอร์รี่',
-  'แชมป์',
-  'แซนต้า',
-  'แบม',
-  'แพม',
-  'โฟล์ค',
-  'โมเมย์',
-  'โรมัน',
-  'ไอคิว',
-];
+/** Sheet nickname → filename stem when spelling differs from the .jpg file. */
+const NICKNAME_PHOTO_ALIASES = {
+  ตัวโน้ต: 'ตัวโน็ต',
+  ออร์แกน: 'ออแกนร์',
+};
 
-const MEMBER_PHOTO_STEM_LOOKUP = (() => {
-  const map = new Map();
-  for (const stem of MEMBER_PHOTO_STEMS) {
-    map.set(stem, stem);
-    if (/^[a-z0-9]+$/i.test(stem)) map.set(stem.toLowerCase(), stem);
-  }
-  return map;
-})();
-
-function localMemberPhotoUrl(nickname) {
+function memberPhotoStem(nickname) {
   const key = (nickname || '').trim();
   if (!key) return '';
-  const stem = MEMBER_PHOTO_STEM_LOOKUP.get(key) ?? MEMBER_PHOTO_STEM_LOOKUP.get(key.toLowerCase());
+  return NICKNAME_PHOTO_ALIASES[key] || key;
+}
+
+function localMemberPhotoUrl(nickname) {
+  const stem = memberPhotoStem(nickname);
   if (!stem) return '';
-  const filename = `${stem}.jpg`;
-  return `${MEMBER_PHOTO_BASE}/${filename}`
-    .split('/')
+  const base = MEMBER_PHOTO_BASE.split('/')
     .map(part => encodeURIComponent(part))
     .join('/');
+  return `${base}/${encodeURIComponent(`${stem}.jpg`)}`;
+}
+
+function isUsableSheetPhoto(url) {
+  if (!url) return false;
+  const trimmed = url.trim();
+  if (!trimmed || trimmed === '-' || trimmed === '—') return false;
+  return /^https?:\/\//i.test(trimmed) || /^\/\//.test(trimmed);
 }
 
 function resolveMemberPhoto(nickname, sheetPhoto) {
-  const fromSheet = normalizePhotoUrl(sheetPhoto);
-  if (fromSheet) return fromSheet;
+  if (isUsableSheetPhoto(sheetPhoto)) return normalizePhotoUrl(sheetPhoto);
   return localMemberPhotoUrl(nickname);
+}
+
+function memberPhotoFor(member) {
+  return resolveMemberPhoto(member?.nickname, member?.photo);
 }
 
 function classifyMember(row, index) {
   const name = normalizeKey(row, 'name');
-  const nickname = normalizeKey(row, 'nickname');
+  const nickname = normalizeKey(row, 'nickname', 'ชื่อเล่น', 'nick');
   const position = normalizeKey(row, 'position');
   const className = normalizeKey(row, 'class');
   const departmentField = normalizeKey(row, 'department');
@@ -443,8 +416,9 @@ function getSecretaries() {
 /* ── UI builders ── */
 
 function buildAvatar(member, className) {
-  if (member.photo) {
-    return `<img class="${className}" src="${escapeHtml(member.photo)}" alt="${escapeHtml(member.name)}" loading="lazy" data-fallback-initials="${escapeHtml(member.initials)}">`;
+  const photo = memberPhotoFor(member);
+  if (photo) {
+    return `<img class="${className}" src="${escapeHtml(photo)}" alt="${escapeHtml(member.name)}" loading="lazy" data-fallback-initials="${escapeHtml(member.initials)}">`;
   }
   return `<div class="${className} ${className}--initials" aria-hidden="true">${escapeHtml(member.initials)}</div>`;
 }
@@ -789,7 +763,7 @@ async function loadAndRender() {
 
   if (cached) {
     // We have saved data — render it immediately (no spinner)
-    MEMBERS = cached.data;
+    MEMBERS = processRows(cached.data);
     renderExecutiveTree();
     renderDeptPanel(activeDept);
 
@@ -812,9 +786,8 @@ async function loadAndRender() {
 async function fetchAndSave() {
   try {
     const rows = await fetchMembersFromAPI();
-    const members = processRows(rows);
-    writeCache(members);   // save to localStorage for next visit
-    MEMBERS = members;
+    writeCache(rows);
+    MEMBERS = processRows(rows);
     renderExecutiveTree();
     renderDeptPanel(activeDept);
   } catch (err) {
