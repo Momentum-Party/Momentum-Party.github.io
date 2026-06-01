@@ -8,6 +8,16 @@ const DEPT_PANEL_SWAP_MS = 120;
 const LINE_DRAW_DELAY_MS = 180;
 const RESIZE_DEBOUNCE_MS = 150;
 
+// ─────────────────────────────────────────────────────────────
+// CHANGE 1: Added cache constants.
+// CACHE_KEY is the name we store data under in localStorage.
+// CACHE_TTL_MS is how long cached data is considered "fresh"
+// (5 minutes). After 5 min the cache is still SHOWN instantly
+// but a background refresh quietly fetches new data.
+// ─────────────────────────────────────────────────────────────
+const CACHE_KEY = 'momentum_members_v1';
+const CACHE_TTL_MS = 5 * 60 * 1000;
+
 const DEPT_LABELS = {
   executive: 'เลขานุการ',
   academic: 'วิชาการ',
@@ -93,7 +103,7 @@ function explainFetchError(err, isFileProtocol) {
   const msg = err?.message || String(err);
 
   if (isFileProtocol) {
-    return 'Opened as a local file (file://). Run the site on http://localhost — e.g. VS Code “Live Server” — then reload.';
+    return 'Opened as a local file (file://). Run the site on http://localhost — e.g. VS Code "Live Server" — then reload.';
   }
   if (msg.includes('Failed to fetch') || msg.includes('JSONP')) {
     return 'Cannot reach the API (CORS/network). Redeploy Apps Script with "Anyone" access and paste the code from google-apps-script.gs, then update SHEETS_API_URL.';
@@ -131,6 +141,37 @@ async function fetchMembersFromAPI() {
   return rows;
 }
 
+// ─────────────────────────────────────────────────────────────
+// CHANGE 2: Added two cache helper functions.
+//
+// readCache() reads from localStorage synchronously (no waiting).
+// It returns the saved members array if the data is still fresh
+// (within 5 min), or null if there's nothing saved yet.
+//
+// writeCache() saves the latest members to localStorage so the
+// next visit can read it instantly.
+// ─────────────────────────────────────────────────────────────
+function readCache() {
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || !Array.isArray(parsed.data)) return null;
+    const isStale = Date.now() - parsed.ts > CACHE_TTL_MS;
+    return { data: parsed.data, isStale };
+  } catch {
+    return null;
+  }
+}
+
+function writeCache(members) {
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify({ data: members, ts: Date.now() }));
+  } catch {
+    // localStorage may be blocked in some browsers — fail silently
+  }
+}
+
 function normalizeKey(row, ...keys) {
   for (const key of keys) {
     if (row[key] != null && String(row[key]).trim() !== '') {
@@ -159,7 +200,6 @@ function getInitials(name) {
   return name.slice(0, 2).toUpperCase();
 }
 
-/** Map spreadsheet department column → canonical department id */
 function mapDepartmentField(deptField) {
   const text = (deptField || '').trim();
   if (!text) return null;
@@ -200,7 +240,6 @@ function formatInstagramUrl(igLink) {
   return `https://www.instagram.com/${handle}`;
 }
 
-/** Support direct URLs and common Google Drive share links in the photo column */
 function normalizePhotoUrl(url) {
   if (!url) return '';
   const trimmed = url.trim();
@@ -213,10 +252,6 @@ function normalizePhotoUrl(url) {
   return trimmed;
 }
 
-/**
- * Classify members from position keywords + department column.
- * ประธาน → President | รองประธาน → VP | เลขานุการ → Secretary | else → member by department
- */
 function classifyMember(row, index) {
   const name = normalizeKey(row, 'name');
   const nickname = normalizeKey(row, 'nickname');
@@ -438,7 +473,7 @@ function renderExecutiveTree() {
     chart.innerHTML = `
       <div class="members-status members-status--error" role="alert">
         <p>No Party President found in the spreadsheet.</p>
-        <p class="members-status__detail">Add a row whose position contains “ประธาน”.</p>
+        <p class="members-status__detail">Add a row whose position contains "ประธาน".</p>
       </div>
     `;
     return;
@@ -669,24 +704,78 @@ function renderTabs() {
   ).join('');
 }
 
+// ─────────────────────────────────────────────────────────────
+// CHANGE 3: Rewrote loadAndRender() completely.
+//
+// OLD behaviour: always show spinner → wait for GAS → render.
+// Every visit (first and returning) waited for GAS = 5–20 sec.
+//
+// NEW behaviour:
+//   A) Read localStorage immediately (takes ~0ms, no network).
+//   B) If cache exists → render cards RIGHT NOW, user sees
+//      the page instantly. Then fetch GAS quietly in background
+//      to refresh the cache for next time.
+//   C) If no cache (first ever visit) → show spinner, fetch GAS,
+//      render, then save to cache so next visit is instant.
+// ─────────────────────────────────────────────────────────────
 async function loadAndRender() {
-  renderLoadingState();
+  const cached = readCache();
 
+  if (cached) {
+    // We have saved data — render it immediately (no spinner)
+    MEMBERS = cached.data;
+    renderExecutiveTree();
+    renderDeptPanel(activeDept);
+
+    // Then quietly fetch fresh data in the background.
+    // The user won't see any loading state for this.
+    refreshInBackground();
+  } else {
+    // First ever visit — nothing saved yet, must fetch and wait
+    renderLoadingState();
+    await fetchAndSave();
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// CHANGE 4: Added fetchAndSave() helper.
+// This fetches from GAS, saves to cache, and renders.
+// Used both on first visit (awaited) and background refresh
+// (fire-and-forget).
+// ─────────────────────────────────────────────────────────────
+async function fetchAndSave() {
   try {
     const rows = await fetchMembersFromAPI();
-    MEMBERS = processRows(rows);
+    const members = processRows(rows);
+    writeCache(members);   // save to localStorage for next visit
+    MEMBERS = members;
     renderExecutiveTree();
     renderDeptPanel(activeDept);
   } catch (err) {
     console.error('Failed to load members:', err);
-    renderErrorState(err.message || 'Check that the Apps Script is deployed with “Anyone” access.');
+    // Only show error screen if we have nothing to show at all
+    if (MEMBERS.length === 0) {
+      renderErrorState(err.message || 'Check that the Apps Script is deployed with "Anyone" access.');
+    }
+    // If we already rendered from cache, silently ignore the error
   }
+}
+
+// ─────────────────────────────────────────────────────────────
+// CHANGE 5: Added refreshInBackground().
+// This runs fetchAndSave() without blocking anything.
+// The user is already looking at cached cards while this runs.
+// ─────────────────────────────────────────────────────────────
+function refreshInBackground() {
+  fetchAndSave().catch(() => {
+    // Swallow errors — we already have cached data showing
+  });
 }
 
 function scheduleAutoRefresh() {
   clearInterval(refreshTimer);
   refreshTimer = setInterval(() => {
-    if (document.visibilityState === 'visible') loadAndRender();
+    if (document.visibilityState === 'visible') refreshInBackground();
   }, REFRESH_INTERVAL_MS);
 }
 
@@ -723,7 +812,7 @@ function init() {
   window.addEventListener('resize', debouncedScheduleExecutiveLines);
 
   document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible') loadAndRender();
+    if (document.visibilityState === 'visible') refreshInBackground();
   });
 
   loadAndRender();
