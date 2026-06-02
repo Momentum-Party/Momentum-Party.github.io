@@ -1,5 +1,6 @@
-/* Policy page — Instagram post cards */
-.policy-page {
+/* Policy page & homepage highlight — Instagram post cards */
+.policy-page,
+.platform-highlight {
   --cyan: #00c8ff;
   --media-bg: #080c1a;
   --ease-rich: cubic-bezier(0.22, 1, 0.36, 1);
@@ -275,7 +276,8 @@
   transition: opacity 0.35s var(--ease-rich);
 }
 
-.policy-page.is-loaded .ig-card {
+.policy-page.is-loaded .ig-card,
+.platform-highlight.is-loaded .ig-card {
   animation: policyCardIn 0.75s var(--ease-spring) forwards;
   animation-delay: calc(0.45s + var(--i, 0) * 0.07s);
 }
@@ -693,7 +695,8 @@
   margin-left: auto;
 }
 
-.policy-page.is-loaded .ig-card__action--like svg {
+.policy-page.is-loaded .ig-card__action--like svg,
+.platform-highlight.is-loaded .ig-card__action--like svg {
   animation: policyTagPop 0.5s var(--ease-spring) calc(0.9s + var(--i, 0) * 0.07s) backwards;
 }
 

@@ -109,6 +109,9 @@ const POLICIES = [
   },
 ];
 
+/** First three policies — shown on homepage “ชูนโยบายเด่น”. */
+const HIGHLIGHT_POLICIES = POLICIES.slice(0, 3);
+
 const IG_ACTIONS = `
   <div class="ig-card__actions" aria-hidden="true">
     <span class="ig-card__action ig-card__action--like">
@@ -199,32 +202,53 @@ function revealPolicyPage() {
   });
 }
 
-function initPolicyCards() {
-  const grid = document.getElementById('policy-grid');
-  if (!grid) return;
+function revealHighlightPolicies() {
+  const section = document.querySelector('.platform-highlight');
+  if (!section || section.classList.contains('is-loaded')) return;
+  requestAnimationFrame(() => {
+    section.classList.add('is-loaded');
+  });
+}
 
-  grid.innerHTML = POLICIES.map(buildCard).join('');
-
+function bindPolicyGrid(grid) {
   grid.querySelectorAll('.ig-card').forEach((card, i) => {
     card.style.setProperty('--i', i);
   });
 
-  revealPolicyPage();
-
   grid.addEventListener('click', e => {
     const card = e.target.closest('.ig-card');
-    if (!card) return;
+    if (!card || !grid.contains(card)) return;
     toggleCard(card);
   });
 
   grid.addEventListener('keydown', e => {
     if (e.key !== 'Enter' && e.key !== ' ') return;
     const card = e.target.closest('.ig-card');
-    if (!card) return;
+    if (!card || !grid.contains(card)) return;
     e.preventDefault();
     toggleCard(card);
   });
+}
 
+function initHighlightPolicies() {
+  const grid = document.getElementById('platform-grid');
+  if (!grid) return;
+
+  grid.innerHTML = HIGHLIGHT_POLICIES.map(buildCard).join('');
+  bindPolicyGrid(grid);
+  revealHighlightPolicies();
+}
+
+function initPolicyCards() {
+  const grid = document.getElementById('policy-grid');
+  if (!grid) return;
+
+  grid.innerHTML = POLICIES.map(buildCard).join('');
+  bindPolicyGrid(grid);
+  revealPolicyPage();
+}
+
+function initPolicyEscapeKey() {
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
       document.querySelectorAll('.ig-card.is-open').forEach(closeCard);
@@ -232,4 +256,8 @@ function initPolicyCards() {
   });
 }
 
-document.addEventListener('DOMContentLoaded', initPolicyCards);
+document.addEventListener('DOMContentLoaded', () => {
+  initPolicyEscapeKey();
+  initHighlightPolicies();
+  initPolicyCards();
+});
