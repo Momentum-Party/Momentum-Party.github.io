@@ -18,7 +18,7 @@ const IMPACT_STATS = [
   },
   {
     label: 'ผู้ติดตาม Tiktok',
-    value: 159,
+    value: 160,
     unit: 'คน',
     icon: 'image/icons and logos/tik-tok.png',
     href: 'https://www.tiktok.com/@momentum03.skw',
@@ -26,7 +26,7 @@ const IMPACT_STATS = [
   },
   {
     label: 'ผู้ติดตาม IG',
-    value: 291,
+    value: 297,
     unit: 'คน',
     icon: 'image/icons and logos/instagram.png',
     href: 'https://www.instagram.com/mmt.skw',
