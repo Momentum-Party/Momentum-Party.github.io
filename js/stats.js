@@ -26,7 +26,7 @@ const IMPACT_STATS = [
   },
   {
     label: 'ผู้ติดตาม IG',
-    value: 297,
+    value: 321,
     unit: 'คน',
     icon: 'image/icons and logos/instagram.png',
     href: 'https://www.instagram.com/mmt.skw',
